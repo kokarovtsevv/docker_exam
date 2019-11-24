@@ -1,0 +1,62 @@
+
+---
+- name: uninstall old version of docker
+  become: true
+  become_method: sudo
+  yum:
+   name: "{{ un_packages }}"
+   state: absent
+
+- name: install required packages
+  yum:
+   name: "{{ req_packages }}"
+   state: present
+
+- name: set up docker repository
+  get_url:
+   url: "{{ docker_repository }}"
+   dest: "{{ docker_dest }}"
+   mode: 0644
+
+- name: add epel repo
+  become: true
+  become_method: sudo
+  package:
+    name: epel-release
+    state: present
+
+- name: install latest version of docker
+  become: true
+  become_method: sudo
+  yum:
+   name: "{{ in_packages }}"
+   state: present
+
+- name: install pip
+  become: true
+  become_method: sudo
+  yum:
+   name: python-pip 
+   state: present 
+
+- name: upgrade pip
+  become: true
+  become_method: sudo
+  pip:
+    name: pip
+    extra_args: --upgrade
+#    extra_args: --ignore-installed
+#- name: enable and start docker
+#  become: true
+#  become_method: sudo  
+#  systemd:
+#   name: docker
+#   state: started
+#   enabled: yes
+
+- name: pip install docker
+  become: true
+  become_method: sudo
+  pip:
+    name: docker
+    state: present
